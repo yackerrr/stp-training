@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0c0b0f">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+<title>STP 2026 - Vadim's Training</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0c0b0f;--surface:#17161b;--surface2:#201f26;--surface3:#2d2c34;
+  --amber:#e8953a;--amber-bright:#fbbf24;--amber-dim:rgba(232,149,58,.14);--amber-glow:rgba(232,149,58,.35);
+  --teal:#2dd4bf;--teal-dim:rgba(45,212,191,.14);
+  --green:#4ade80;--green-dim:rgba(74,222,128,.14);
+  --coral:#f87171;--coral-dim:rgba(248,113,113,.14);
+  --red:#ef4444;
+  --text:#eae5dd;--text2:#8a8580;--text3:#504c47;
+  --radius:18px;--radius-sm:12px;
+  --display:'Archivo Black',sans-serif;--font:'Plus Jakarta Sans',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+html{background:var(--bg)}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;
+  min-height:100dvh;padding-bottom:90px;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse at 20% 0%,rgba(232,149,58,.03) 0%,transparent 55%),
+    radial-gradient(ellipse at 80% 100%,rgba(248,113,113,.02) 0%,transparent 50%)}
+
+/* ===== NAV ===== */
+.nav{position:fixed;bottom:0;left:0;right:0;z-index:100;
+  background:rgba(12,11,15,.9);backdrop-filter:blur(24px) saturate(1.3);-webkit-backdrop-filter:blur(24px) saturate(1.3);
+  border-top:1px solid rgba(255,255,255,.05);padding:5px 0 env(safe-area-inset-bottom,8px);display:flex}
+.nav-btn{flex:1;background:none;border:none;color:var(--text3);font-family:var(--font);
+  font-size:10px;font-weight:600;display:flex;flex-direction:column;align-items:center;
+  gap:3px;padding:7px 0;cursor:pointer;transition:color .25s;position:relative;letter-spacing:.3px}
+.nav-btn.active{color:var(--amber)}
+.nav-btn.active::after{content:'';position:absolute;top:-1px;left:50%;transform:translateX(-50%);
+  width:24px;height:2px;background:var(--amber);border-radius:0 0 2px 2px;
+  box-shadow:0 2px 10px var(--amber-glow)}
+.nav-btn svg{width:22px;height:22px;fill:currentColor}
+
+/* ===== PAGES ===== */
+.page{display:none;padding:20px 16px;position:relative;z-index:1}
+.page.active{display:block;animation:fadeUp .3s cubic-bezier(.22,.9,.36,1)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ===== HERO ===== */
+.hero{text-align:center;padding:32px 0 6px}
+.hero-title{font-family:var(--display);font-size:48px;font-weight:400;line-height:1;
+  letter-spacing:2px;display:inline-block;
+  background:linear-gradient(135deg,var(--amber-bright) 0%,var(--amber) 40%,var(--coral) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 20px rgba(232,149,58,.2))}
+.hero-sub{color:var(--text2);font-size:14px;margin-top:8px;font-weight:500;letter-spacing:.3px}
+
+/* ===== RING ===== */
+.ring-wrap{display:flex;justify-content:center;margin:28px 0 24px}
+.ring-container{position:relative;width:200px;height:200px}
+.ring-svg{width:200px;height:200px;transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:var(--surface2);stroke-width:7}
+.ring-fg{fill:none;stroke:url(#grad);stroke-width:7;stroke-linecap:round;
+  transition:stroke-dashoffset 1s cubic-bezier(.22,.9,.36,1);
+  filter:drop-shadow(0 0 6px rgba(232,149,58,.3))}
+.ring-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.ring-num{font-family:var(--display);font-size:56px;font-weight:400;color:var(--text);line-height:1}
+.ring-label{font-size:11px;color:var(--text2);font-weight:600;margin-top:4px;text-transform:uppercase;letter-spacing:1.5px}
+
+/* ===== STATS ===== */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.stat{background:var(--surface);border-radius:var(--radius-sm);padding:16px 10px;text-align:center;
+  border:1px solid rgba(255,255,255,.04)}
+.stat-val{font-family:var(--mono);font-size:24px;font-weight:800;color:var(--amber)}
+.stat-val.orange{color:var(--coral)}.stat-val.green{color:var(--green)}
+.stat-lbl{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.8px;margin-top:4px}
+
+/* ===== TODAY CARD (dominant) ===== */
+.today{border-radius:var(--radius);padding:28px 24px;margin-bottom:18px;position:relative;overflow:hidden}
+.today-ride{background:linear-gradient(135deg,#1c1508,#140f06);
+  border:1px solid var(--amber-dim);box-shadow:0 4px 30px rgba(232,149,58,.06)}
+.today-rest{background:linear-gradient(135deg,#0c1a0f,#091208);border:1px solid var(--green-dim)}
+.today-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--amber);margin-bottom:10px}
+.today-rest .today-label{color:var(--green)}
+.today-name{font-family:var(--display);font-size:24px;font-weight:400;margin-bottom:4px}
+.today-miles{font-family:var(--mono);font-size:44px;font-weight:800;color:var(--amber);line-height:1;margin:10px 0;
+  text-shadow:0 0 30px rgba(232,149,58,.15)}
+.today-rest .today-miles{color:var(--green)}
+.today-desc{font-size:14px;color:var(--text2);line-height:1.6}
+.today-glow{position:absolute;top:-50px;right:-50px;width:160px;height:160px;border-radius:50%;
+  background:var(--amber);opacity:.04;pointer-events:none;filter:blur(8px)}
+
+/* ===== PROGRESS ===== */
+.progress-card{background:var(--surface);border-radius:var(--radius);padding:20px;margin-bottom:18px;
+  border:1px solid rgba(255,255,255,.04)}
+.progress-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.progress-logged{font-family:var(--mono);font-size:28px;font-weight:800;color:var(--amber)}
+.progress-of{font-size:13px;color:var(--text3)}
+.progress-track{height:5px;background:var(--surface3);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--amber),var(--amber-bright));
+  transition:width .8s ease;box-shadow:0 0 10px rgba(232,149,58,.25)}
+.progress-bottom{display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:var(--text3)}
+
+/* ===== FAB ===== */
+.fab{position:fixed;bottom:80px;right:20px;width:56px;height:56px;border-radius:50%;
+  background:linear-gradient(135deg,var(--amber),#d4800e);border:none;color:var(--bg);
+  font-size:28px;font-weight:300;cursor:pointer;z-index:99;
+  box-shadow:0 4px 20px var(--amber-glow);transition:transform .2s}
+.fab:active{transform:scale(.9)}
+
+/* ===== MODAL ===== */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:200;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:flex-end;justify-content:center}
+.modal-bg.show{display:flex}
+.modal{background:var(--surface);border-radius:22px 22px 0 0;padding:28px 20px 36px;
+  width:100%;max-width:480px;max-height:85vh;overflow-y:auto}
+.modal-handle{width:36px;height:4px;background:var(--surface3);border-radius:2px;margin:0 auto 20px}
+.modal h3{font-family:var(--display);font-size:20px;font-weight:400;margin-bottom:18px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px;
+  text-transform:uppercase;letter-spacing:.8px}
+.field input,.field textarea{width:100%;padding:14px 16px;background:var(--surface2);
+  border:1px solid var(--surface3);border-radius:var(--radius-sm);color:var(--text);
+  font-size:16px;font-family:var(--font);outline:none;-webkit-appearance:none;transition:border-color .2s}
+.field input:focus,.field textarea:focus{border-color:var(--amber)}
+.field textarea{resize:none}
+.btn{width:100%;padding:16px;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:700;
+  cursor:pointer;font-family:var(--font);transition:transform .1s;letter-spacing:.2px}
+.btn:active{transform:scale(.98)}
+.btn-cyan{background:linear-gradient(135deg,var(--amber),#d4800e);color:var(--bg)}
+.btn-red{background:var(--surface2);color:var(--red);margin-top:8px}
+.btn-ghost{background:var(--surface2);color:var(--text2);margin-top:8px}
+.btn-remove{background:var(--coral-dim);color:var(--coral);border:1px solid rgba(248,113,113,.2);margin-top:8px}
+
+/* ===== PLAN ===== */
+.plan-header{margin-bottom:22px}
+.plan-header h2{font-family:var(--display);font-size:28px;font-weight:400;letter-spacing:1px;
+  background:linear-gradient(135deg,var(--amber-bright),var(--coral));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.plan-header p{color:var(--text3);font-size:13px;margin-top:5px;line-height:1.5}
+
+.week{background:var(--surface);border-radius:var(--radius);margin-bottom:12px;
+  border:1px solid rgba(255,255,255,.04);overflow:hidden;transition:border-color .3s;position:relative}
+.week.current{border-color:rgba(232,149,58,.18)}
+.week.current::before{content:'';position:absolute;top:0;left:0;bottom:0;width:3px;
+  background:linear-gradient(180deg,var(--amber-bright),var(--coral));z-index:1}
+.week-top{padding:16px 18px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.week-num{font-family:var(--display);font-size:12px;font-weight:400;color:var(--amber);letter-spacing:1px}
+.week.current .week-num::after{content:" NOW";color:var(--coral)}
+.week-dates{font-size:12px;color:var(--text3);margin-top:3px}
+.week-right{display:flex;align-items:center;gap:10px}
+.week-total{font-family:var(--mono);font-size:20px;font-weight:800;color:var(--text)}
+.week-mi{font-size:11px;color:var(--text3);font-weight:600}
+.phase-tag{font-size:9px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.8px}
+.tag-base{background:var(--teal-dim);color:var(--teal)}
+.tag-build{background:var(--amber-dim);color:var(--amber)}
+.tag-peak{background:var(--coral-dim);color:var(--coral)}
+.tag-taper{background:var(--green-dim);color:var(--green)}
+.tag-rest{background:rgba(255,255,255,.06);color:var(--text3)}
+
+.week-body{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.week-body.open{max-height:600px}
+.week-body-inner{padding:0 18px 16px}
+.week-focus{font-size:13px;color:var(--text2);margin-bottom:12px;padding-top:12px;
+  border-top:1px solid rgba(255,255,255,.04);line-height:1.5}
+
+.ride-row{display:flex;align-items:center;padding:10px 0;gap:10px;border-bottom:1px solid rgba(255,255,255,.03)}
+.ride-row:last-child{border-bottom:none}
+.ride-day{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text3);width:32px;
+  flex-shrink:0;text-transform:uppercase;letter-spacing:.5px}
+.ride-info{flex:1;min-width:0}
+.ride-name{font-size:14px;font-weight:700}
+.ride-desc{font-size:12px;color:var(--text3);margin-top:2px;line-height:1.4}
+.ride-mi{font-family:var(--mono);font-size:18px;font-weight:800;color:var(--amber);flex-shrink:0;
+  min-width:44px;text-align:right}
+.ride-mi.rest{color:var(--text3);font-size:14px}
+
+/* ===== CHECK BUTTON (stamp feel) ===== */
+.ck{width:34px;height:34px;border-radius:50%;border:2px solid var(--surface3);background:none;
+  color:transparent;font-size:16px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;
+  justify-content:center;transition:all .3s cubic-bezier(.22,.9,.36,1);-webkit-appearance:none}
+.ck:active{transform:scale(.85)}
+.ck.done{background:var(--amber);border-color:var(--amber);color:var(--bg);
+  box-shadow:0 0 14px var(--amber-glow);transform:rotate(-5deg)}
+.ck.done:active{transform:rotate(-5deg) scale(.85)}
+.ck.noride{visibility:hidden}
+
+/* ===== STORM OVERLAY ===== */
+#storm{position:fixed;inset:0;z-index:999;pointer-events:none;display:none}
+#storm.active{display:block;pointer-events:auto}
+#storm-bg{position:absolute;inset:0;background:rgba(0,0,0,.6);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);opacity:0;transition:opacity .3s ease}
+#storm canvas{position:absolute;inset:0;width:100%;height:100%}
+#storm-msg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(.88);text-align:center;
+  opacity:0;transition:opacity .4s ease,transform .5s cubic-bezier(.15,.8,.25,1);
+  background:rgba(12,11,15,.8);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border-radius:24px;padding:32px 44px;border:1px solid rgba(232,149,58,.12);
+  box-shadow:0 0 60px rgba(0,0,0,.5)}
+#storm-text{font-family:var(--display);font-size:26px;font-weight:400;
+  background:linear-gradient(135deg,var(--amber-bright),var(--coral),var(--amber));background-size:200% 200%;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:shimmer 1.5s ease infinite;line-height:1.2}
+@keyframes shimmer{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+#storm-sub{font-size:14px;color:var(--text);margin-top:10px;font-weight:500}
+#storm-miles{font-family:var(--mono);font-size:48px;font-weight:800;color:var(--amber);
+  margin-bottom:8px;text-shadow:0 0 30px var(--amber-glow),0 0 60px rgba(232,149,58,.2)}
+
+/* ===== CONFIRM MODAL ===== */
+.confirm-bg{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.55);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  align-items:center;justify-content:center}
+.confirm-bg.show{display:flex;animation:confirmIn .3s ease}
+@keyframes confirmIn{from{opacity:0}to{opacity:1}}
+.confirm-card{background:linear-gradient(150deg,var(--surface),var(--surface2));
+  border:1px solid var(--amber-dim);border-radius:24px;
+  padding:36px 28px 28px;text-align:center;max-width:300px;width:85%;
+  box-shadow:0 0 80px rgba(232,149,58,.04),0 20px 40px rgba(0,0,0,.4);
+  animation:cardIn .35s cubic-bezier(.2,.8,.3,1)}
+@keyframes cardIn{from{opacity:0;transform:scale(.85) translateY(20px)}to{opacity:1;transform:none}}
+.confirm-emoji{font-size:44px;margin-bottom:14px;display:block}
+.confirm-name{font-family:var(--display);font-size:20px;font-weight:400;margin-bottom:4px}
+.confirm-detail{font-size:13px;color:var(--text3);margin-bottom:16px;font-weight:500}
+.confirm-mi{font-family:var(--mono);font-size:52px;font-weight:800;color:var(--amber);
+  text-shadow:0 0 30px rgba(232,149,58,.2);line-height:1;margin-bottom:4px}
+.confirm-mi-label{font-size:12px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;
+  font-weight:600;margin-bottom:24px}
+
+/* ===== ROUTE ===== */
+.route-day{margin-bottom:28px}
+.route-day-header{font-family:var(--display);font-size:13px;font-weight:400;color:var(--amber);
+  text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px;padding-bottom:10px;
+  border-bottom:1px solid var(--amber-dim)}
+.route-day-header span{display:block;font-family:var(--font);font-size:20px;font-weight:800;
+  color:var(--text);text-transform:none;letter-spacing:0;margin-top:4px}
+.stop{display:flex;gap:14px;position:relative;padding-bottom:20px}
+.stop:last-child{padding-bottom:0}
+.stop-line{position:relative;display:flex;flex-direction:column;align-items:center;width:28px;flex-shrink:0}
+.stop-dot{width:10px;height:10px;border-radius:50%;background:var(--surface3);
+  border:2px solid var(--text3);z-index:1;flex-shrink:0}
+.stop-dot.major{width:16px;height:16px;background:var(--amber);border-color:var(--amber);
+  box-shadow:0 0 10px rgba(232,149,58,.35)}
+.stop-dot.finish{width:16px;height:16px;background:var(--green);border-color:var(--green);
+  box-shadow:0 0 10px rgba(74,222,128,.35)}
+.stop-dot.start{width:16px;height:16px;background:var(--coral);border-color:var(--coral);
+  box-shadow:0 0 10px rgba(248,113,113,.35)}
+.stop-wire{flex:1;width:2px;background:var(--surface3);margin-top:4px}
+.stop:last-child .stop-wire{display:none}
+.stop-content{flex:1}
+.stop-mile-num{font-family:var(--mono);font-size:11px;font-weight:800;color:var(--text3);letter-spacing:.5px}
+.stop-place{font-size:15px;font-weight:700;margin-top:2px}
+.stop-place.major{color:var(--amber)}.stop-place.finish{color:var(--green)}
+.stop-detail{font-size:12px;color:var(--text3);margin-top:3px;line-height:1.5}
+.stop-badge{display:inline-block;font-size:9px;font-weight:700;padding:3px 9px;border-radius:8px;
+  margin-top:5px;text-transform:uppercase;letter-spacing:.5px}
+.badge-rest{background:var(--amber-dim);color:var(--amber)}
+.badge-mini{background:rgba(255,255,255,.05);color:var(--text3)}
+.badge-start{background:var(--coral-dim);color:var(--coral)}
+.badge-finish{background:var(--green-dim);color:var(--green)}
+
+/* ===== TIPS ===== */
+.tip-card{background:var(--surface);border-radius:var(--radius);margin-bottom:12px;
+  border:1px solid rgba(255,255,255,.04);overflow:hidden;transition:border-color .2s}
+.tip-card.open{border-color:rgba(255,255,255,.07)}
+.tip-top{padding:16px 18px;display:flex;align-items:center;gap:12px;cursor:pointer}
+.tip-icon{font-size:24px;flex-shrink:0}.tip-title{font-size:15px;font-weight:700;flex:1}
+.tip-arrow{color:var(--text3);font-size:12px;transition:transform .25s cubic-bezier(.22,.9,.36,1)}
+.tip-card.open .tip-arrow{transform:rotate(90deg);color:var(--amber)}
+.tip-body{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.tip-card.open .tip-body{max-height:2000px}
+.tip-body-inner{padding:0 18px 18px}
+.tip-body-inner ul{list-style:none}
+.tip-body-inner li{font-size:14px;color:var(--text2);line-height:1.7;padding:6px 0;
+  border-bottom:1px solid rgba(255,255,255,.03);padding-left:12px;position:relative}
+.tip-body-inner li:last-child{border:none}
+.tip-body-inner li::before{content:"";position:absolute;left:0;top:14px;width:4px;height:4px;
+  border-radius:50%;background:var(--amber)}
+.tip-body-inner strong{color:var(--text);font-weight:700}
+
+/* ===== LOG LIST ===== */
+.log-entry{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;
+  background:var(--surface);border-radius:var(--radius-sm);margin-bottom:8px;
+  border:1px solid rgba(255,255,255,.04);cursor:pointer;transition:border-color .2s}
+.log-entry:active{border-color:var(--amber-dim)}
+.log-date{font-size:12px;color:var(--text3)}
+.log-note{font-size:13px;color:var(--text2);margin-top:2px}
+.log-miles{font-family:var(--mono);font-size:20px;font-weight:800;color:var(--amber)}
+.log-empty{text-align:center;padding:40px 20px;color:var(--text3);font-size:14px}
+
+.sec-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
+.sec-title{font-family:var(--display);font-size:11px;font-weight:400;color:var(--text3);
+  text-transform:uppercase;letter-spacing:1.5px}
+
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:2px}
+
+.overview{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.ov-card{background:var(--surface);border-radius:14px;padding:18px 14px;border:1px solid rgba(255,255,255,.04);text-align:center}
+.ov-val{font-family:var(--mono);font-size:28px;font-weight:800}
+.ov-val.v1{color:var(--amber)}.ov-val.v2{color:var(--coral)}.ov-val.v3{color:var(--green)}.ov-val.v4{color:var(--teal)}
+.ov-lbl{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-top:4px}
+
+/* ===== SETTINGS BUTTON ===== */
+.settings-btn{position:absolute;top:22px;right:14px;z-index:5;
+  width:38px;height:38px;border-radius:50%;background:var(--surface);
+  border:1px solid rgba(255,255,255,.06);color:var(--text2);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  transition:color .2s,border-color .2s,transform .1s}
+.settings-btn:active{transform:scale(.92)}
+.settings-btn:hover{color:var(--amber);border-color:var(--amber-dim)}
+.settings-btn svg{width:18px;height:18px;fill:currentColor}
+.loc-status{font-size:12px;color:var(--text3);margin-top:6px;min-height:16px}
+.loc-status.ok{color:var(--green)}
+.loc-status.err{color:var(--coral)}
+
+/* ===== WEATHER CARD ===== */
+.weather{background:var(--surface);border-radius:var(--radius);padding:18px 20px;
+  margin-bottom:18px;border:1px solid rgba(255,255,255,.04);
+  display:flex;align-items:center;gap:16px}
+.weather-empty{background:var(--surface);border-radius:var(--radius);padding:16px 20px;
+  margin-bottom:18px;border:1px dashed rgba(255,255,255,.08);
+  color:var(--text3);font-size:13px;text-align:center;cursor:pointer}
+.weather-empty:active{border-color:var(--amber-dim);color:var(--text2)}
+.weather-icon{font-size:38px;line-height:1;flex-shrink:0}
+.weather-info{flex:1;min-width:0}
+.weather-label{font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:1.5px;color:var(--text3);margin-bottom:4px}
+.weather-day{font-family:var(--display);font-size:16px;font-weight:400;
+  letter-spacing:.5px;margin-bottom:2px}
+.weather-cond{font-size:13px;color:var(--text2)}
+.weather-temps{text-align:right;flex-shrink:0}
+.weather-hi{font-family:var(--mono);font-size:24px;font-weight:800;color:var(--amber);line-height:1}
+.weather-lo{font-family:var(--mono);font-size:13px;color:var(--text3);margin-top:2px}
+.weather-rain{font-size:11px;color:var(--teal);margin-top:3px;font-weight:600}
+
+/* ===== PRE-TRAINING CARD ===== */
+.today-pre{background:linear-gradient(135deg,#0d1418,#0a0e12);border:1px solid rgba(45,212,191,.14)}
+.today-pre .today-label{color:var(--teal)}
+.today-pre .today-glow{background:var(--teal)}
+
+@media(prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+
+<div id="p-home" class="page active">
+  <button class="settings-btn" onclick="openSettings()" aria-label="Settings">
+    <svg viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65a.5.5 0 0 0 .12-.64l-2-3.46a.5.5 0 0 0-.61-.22l-2.49 1a7.3 7.3 0 0 0-1.69-.98l-.38-2.65A.5.5 0 0 0 14 2h-4a.5.5 0 0 0-.49.42l-.38 2.65c-.61.25-1.17.58-1.69.98l-2.49-1a.5.5 0 0 0-.61.22l-2 3.46a.5.5 0 0 0 .12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65a.5.5 0 0 0-.12.64l2 3.46c.14.24.43.34.69.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65A.5.5 0 0 0 10 22h4a.5.5 0 0 0 .49-.42l.38-2.65c.61-.25 1.17-.58 1.69-.98l2.49 1c.26.12.55.02.69-.22l2-3.46a.5.5 0 0 0-.12-.64l-2.11-1.65zM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7z"/></svg>
+  </button>
+  <div class="hero">
+    <div class="hero-title">STP 2026</div>
+    <div class="hero-sub">Vadim's Seattle to Portland Training</div>
+  </div>
+  <div class="ring-wrap"><div class="ring-container">
+    <svg class="ring-svg" viewBox="0 0 200 200">
+      <defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#e8953a"/><stop offset="100%" stop-color="#f87171"/>
+      </linearGradient></defs>
+      <circle class="ring-bg" cx="100" cy="100" r="88"/>
+      <circle class="ring-fg" id="ring" cx="100" cy="100" r="88" stroke-dasharray="553" stroke-dashoffset="553"/>
+    </svg>
+    <div class="ring-center"><div class="ring-num" id="cd-days">--</div><div class="ring-label">days to go</div></div>
+  </div></div>
+  <div class="stats">
+    <div class="stat"><div class="stat-val" id="cd-weeks">--</div><div class="stat-lbl">Weeks</div></div>
+    <div class="stat"><div class="stat-val orange" id="cd-rides">--</div><div class="stat-lbl">Rides Left</div></div>
+    <div class="stat"><div class="stat-val green">206</div><div class="stat-lbl">Total Miles</div></div>
+  </div>
+  <div id="today-card"></div>
+  <div id="weather-card"></div>
+  <div class="progress-card">
+    <div class="progress-top">
+      <div><span class="progress-logged" id="p-logged">0</span><span class="progress-of"> mi logged</span></div>
+      <div class="progress-of"><span id="p-total">416</span> planned</div>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="p-fill" style="width:0%"></div></div>
+    <div class="progress-bottom"><span id="p-pct">0%</span><span id="p-count">0 rides</span></div>
+  </div>
+  <div class="sec-head"><div class="sec-title">Recent Rides</div></div>
+  <div id="log-list"></div>
+</div>
+
+<div id="p-plan" class="page">
+  <div class="plan-header"><h2>THE PLAN</h2>
+    <p>7 weeks &middot; 3 rides/week &middot; Peloton OK midweek &middot; Tap &check; to log</p></div>
+  <div id="plan-list"></div>
+</div>
+
+<div id="p-route" class="page">
+  <div class="plan-header"><h2>THE ROUTE</h2><p>206 miles &middot; 5,100 ft elevation &middot; July 11-12</p></div>
+  <div class="overview">
+    <div class="ov-card"><div class="ov-val v1">103</div><div class="ov-lbl">Day 1 Miles</div></div>
+    <div class="ov-card"><div class="ov-val v2">103</div><div class="ov-lbl">Day 2 Miles</div></div>
+    <div class="ov-card"><div class="ov-val v3">5,100</div><div class="ov-lbl">Ft Climbing</div></div>
+    <div class="ov-card"><div class="ov-val v4">19</div><div class="ov-lbl">Rest Stops</div></div>
+  </div>
+  <div id="route-list"></div>
+</div>
+
+<div id="p-tips" class="page">
+  <div class="plan-header"><h2>STP TIPS</h2><p>Personalized for Vadim &middot; Age 61 &middot; 200 lbs</p></div>
+  <div id="tips-list"></div>
+</div>
+
+<button class="fab" id="fab" onclick="openLog()">+</button>
+
+<!-- LOG MODAL -->
+<div class="modal-bg" id="log-modal">
+  <div class="modal"><div class="modal-handle"></div>
+    <h3 id="modal-title">Log a Ride</h3>
+    <div class="field"><label>Date</label><input type="date" id="f-date"></div>
+    <div class="field"><label>Distance (miles)</label><input type="number" id="f-miles" step="0.1" placeholder="0" inputmode="decimal"></div>
+    <div class="field"><label>Duration (optional)</label><input type="text" id="f-dur" placeholder="e.g. 2h 30m"></div>
+    <div class="field"><label>Notes (optional)</label><textarea id="f-notes" rows="2" placeholder="How'd it feel?"></textarea></div>
+    <button class="btn btn-cyan" id="modal-save" onclick="saveLog()">Save Ride</button>
+    <button class="btn btn-red" id="modal-del" onclick="delLog()" style="display:none">Delete</button>
+    <button class="btn btn-ghost" onclick="closeLog()">Cancel</button>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-bg" id="settings-modal">
+  <div class="modal"><div class="modal-handle"></div>
+    <h3>Settings</h3>
+    <div class="field">
+      <label>Weather Location</label>
+      <input type="text" id="f-loc" placeholder="e.g. Seattle, WA" autocomplete="off">
+      <div id="loc-status" class="loc-status"></div>
+    </div>
+    <button class="btn btn-cyan" onclick="saveSettings()">Save</button>
+    <button class="btn btn-remove" onclick="resetAll()">Reset All Data</button>
+    <button class="btn btn-ghost" onclick="closeSettings()">Close</button>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="confirm-bg" id="confirm-modal">
+  <div class="confirm-card">
+    <span class="confirm-emoji">&#x1F6B4;</span>
+    <div class="confirm-name" id="confirm-name"></div>
+    <div class="confirm-detail" id="confirm-detail"></div>
+    <div class="confirm-mi" id="confirm-mi"></div>
+    <div class="confirm-mi-label">miles</div>
+    <button class="btn btn-cyan" id="confirm-action" onclick="confirmRide()">Log This Ride</button>
+    <button class="btn btn-ghost" onclick="cancelConfirm()">Cancel</button>
+  </div>
+</div>
+
+<!-- STORM OVERLAY -->
+<div id="storm">
+  <div id="storm-bg"></div>
+  <canvas id="storm-canvas"></canvas>
+  <div id="storm-msg">
+    <div id="storm-miles"></div>
+    <div id="storm-text"></div>
+    <div id="storm-sub"></div>
+  </div>
+</div>
+
+<nav class="nav">
+  <button class="nav-btn active" onclick="go('home',this)">
+    <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Home</button>
+  <button class="nav-btn" onclick="go('plan',this)">
+    <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 10h5v5H7z"/></svg>Plan</button>
+  <button class="nav-btn" onclick="go('route',this)">
+    <svg viewBox="0 0 24 24"><path d="M21 3L3 10.53v.98l6.84 2.65L12.48 21h.98L21 3z"/></svg>Route</button>
+  <button class="nav-btn" onclick="go('tips',this)">
+    <svg viewBox="0 0 24 24"><path d="M9 21c0 .5.4 1 1 1h4c.6 0 1-.5 1-1v-1H9v1zm3-19C8.1 2 5 5.1 5 9c0 2.4 1.2 4.5 3 5.7V17c0 .5.4 1 1 1h6c.6 0 1-.5 1-1v-2.3c1.8-1.3 3-3.4 3-5.7 0-3.9-3.1-7-7-7z"/></svg>Tips</button>
+</nav>
+
+<script>
+const EVENT=new Date(2026,6,11);
+const START=new Date(2026,4,25);
+
+const PLAN=[
+  {wk:1,dates:"May 25-31",phase:"Base",tag:"tag-base",mi:42,
+   focus:"Build the routine, start fueling practice",
+   rides:[
+    {d:"Tue",n:"Easy Spin",desc:"10 mi flat outside or 30 min Peloton",mi:10},
+    {d:"Thu",n:"Steady Ride",desc:"Add a gentle hill or two. Comfortable pace",mi:12},
+    {d:"Sat",n:"Long Ride",desc:"Bring a snack, eat at mile 10. Practice fueling!",mi:20}
+  ]},
+  {wk:2,dates:"Jun 1-7",phase:"Build",tag:"tag-build",mi:55,
+   focus:"Stretch to 30 miles. Wear your race-day shorts and kit",
+   rides:[
+    {d:"Tue",n:"Easy Spin",desc:"10 mi outside or 40 min Peloton endurance",mi:10},
+    {d:"Thu",n:"Hills Ride",desc:"Pick a route with climbing. Build leg strength",mi:15},
+    {d:"Sat",n:"Long Ride",desc:"Wear STP kit, test comfort. Full nutrition practice",mi:30}
+  ]},
+  {wk:3,dates:"Jun 8-14",phase:"Build",tag:"tag-build",mi:65,
+   focus:"First back-to-back weekend! Simulates STP Day 1 + Day 2",
+   rides:[
+    {d:"Tue",n:"Easy Spin",desc:"10 mi outside or 40 min Peloton",mi:10},
+    {d:"Thu",n:"Hills Ride",desc:"Moderate effort with sustained climbs",mi:15},
+    {d:"Sat",n:"Long Ride",desc:"Steady pace, practice your rest-stop routine",mi:30},
+    {d:"Sun",n:"Day 2 Legs",desc:"Ride on tired legs \u2014 STP Day 2 practice!",mi:10}
+  ]},
+  {wk:4,dates:"Jun 15-21",phase:"Build",tag:"tag-build",mi:73,
+   focus:"New longest ride: 40 miles! Back-to-back weekend again",
+   rides:[
+    {d:"Tue",n:"Easy Spin",desc:"10 mi outside or 30 min Peloton. Easy this week",mi:10},
+    {d:"Thu",n:"Steady Ride",desc:"Event pace. Nothing over moderate effort",mi:15},
+    {d:"Sat",n:"Long Ride",desc:"40 miles! Full race nutrition. Stop every hour",mi:40},
+    {d:"Sun",n:"Day 2 Legs",desc:"Easy spin on tired legs. This is normal!",mi:8}
+  ]},
+  {wk:5,dates:"Jun 22-28",phase:"Peak",tag:"tag-peak",mi:83,
+   focus:"PEAK WEEK \u2014 match your 50-mile Discovery Trail PR!",
+   rides:[
+    {d:"Tue",n:"Easy Spin",desc:"10 mi outside or 30 min Peloton. Save legs",mi:10},
+    {d:"Thu",n:"Steady Ride",desc:"Moderate and flat. Don't go hard before Saturday",mi:15},
+    {d:"Sat",n:"Long Ride",desc:"50 miles! Your biggest training ride. Full race sim",mi:50},
+    {d:"Sun",n:"Day 2 Legs",desc:"Easy spin. Last back-to-back before STP",mi:8}
+  ]},
+  {wk:6,dates:"Jun 29 - Jul 5",phase:"Taper",tag:"tag-taper",mi:40,
+   focus:"Ride less, rest more. Bike shop tune-up this week!",
+   rides:[
+    {d:"Tue",n:"Easy Spin",desc:"10 mi outside or 30 min easy Peloton",mi:10},
+    {d:"Thu",n:"Easy Ride",desc:"Flat and easy. Enjoy the scenery",mi:12},
+    {d:"Sat",n:"Shakeout",desc:"Test bike after tune-up. Easy effort only",mi:18}
+  ]},
+  {wk:7,dates:"Jul 6-12",phase:"Rest",tag:"tag-rest",mi:8,
+   focus:"REST WEEK. Light spinning only. Prep gear, pack bags \u2014 race Saturday!",
+   rides:[
+    {d:"Tue",n:"Light Spin",desc:"20-30 min very easy. Peloton or outside",mi:8},
+    {d:"Thu",n:"Rest Day",desc:"Full rest. Stretch, foam roll. Lay out gear",mi:0},
+    {d:"Fri",n:"Packet Pickup",desc:"UW Lot E-18, 6-9 PM. Drop overnight bag",mi:0}
+  ]}
+];
+
+const ROUTE=[
+  {day:1,sub:"Seattle to Centralia",stops:[
+    {mi:0,name:"UW Parking Lot E-18",info:"2-day riders depart 5:30-7:30 AM",t:"start"},
+    {mi:10,name:"Seward Park",info:"Mechanic, restrooms. Food for purchase",t:"mini"},
+    {mi:19,name:"IKEA Renton",info:"Rest stop \u2014 free food",t:"rest"},
+    {mi:42,name:"Kalles Jr High, Puyallup",info:"Mini-stop. Food for purchase",t:"mini"},
+    {mi:55,name:"Spanaway Middle School",info:"Major rest stop \u2014 free food, mechanic",t:"rest"},
+    {mi:71,name:"McKenna Elementary",info:"Mini-stop. Food for purchase",t:"mini"},
+    {mi:74,name:"Yelm City Park",info:"Portapotties only",t:"mini"},
+    {mi:88,name:"Tenino City Park",info:"Mini-stop. Food for purchase",t:"mini"},
+    {mi:101,name:"Centralia College",info:"MIDPOINT! Medical, mechanic, food. Overnight here",t:"rest"}
+  ]},
+  {day:2,sub:"Centralia to Portland",stops:[
+    {mi:101,name:"Centralia / Chehalis",info:"Day 2 start. Get rolling early!",t:"start"},
+    {mi:108,name:"Chehalis Recreation Park",info:"Mini-stop. Food for purchase",t:"mini"},
+    {mi:129,name:"Vader",info:"Mini-stop. Food for purchase",t:"mini"},
+    {mi:138,name:"Castle Rock High School",info:"Water, portapotties, baked goods",t:"mini"},
+    {mi:147,name:"Riverside Park, Lexington",info:"Major rest stop \u2014 free food. Recharge",t:"rest"},
+    {mi:163,name:"Goble Tavern, OR",info:"You're in Oregon!",t:"mini"},
+    {mi:177,name:"St. Helens Elementary, OR",info:"Last major stop \u2014 free food. 29 mi to go!",t:"rest"},
+    {mi:188,name:"Scappoose, OR",info:"Mini-stop. Free water. Almost there!",t:"mini"},
+    {mi:206,name:"Holladay Park, Portland",info:"FINISH! Meal, shirt, badge. You did it!",t:"finish"}
+  ]}
+];
+
+const TIPS=[
+  {icon:"\u26A1",title:"Pacing (from your Strava)",items:[
+    "<strong>Your natural pace is ~11 mph</strong> based on your 55-mi Discovery Trail ride. That's a great STP pace.",
+    "<strong>At 11 mph: each day = ~9.5 hrs riding.</strong> Add 1.5 hrs for stops = ~11 hrs. Start 6 AM, finish ~5 PM.",
+    "<strong>Start slower than feels right.</strong> First 20 miles should feel too easy. You have 80+ miles to go.",
+    "<strong>Don't chase faster riders.</strong> 8,000 people out there. Many who pass early will bonk later.",
+    "<strong>Mile 60-80 is the grind.</strong> Everyone hurts here. Keep eating, keep pedaling.",
+    "<strong>Day 2 feels rough at first</strong> but your legs warm up after 10-15 miles. Trust it."]},
+  {icon:"\uD83C\uDF54",title:"Nutrition (critical at 200 lbs)",items:[
+    "<strong>Eat at mile 15, then every 30 min.</strong> If you wait until hungry, it's too late.",
+    "<strong>250-300 calories per hour</strong> from the start. You burn more fuel at your weight.",
+    "<strong>1-1.5 bottles per hour with electrolytes.</strong> Skratch, Nuun, or LMNT. Plain water isn't enough.",
+    "<strong>Breakfast:</strong> Big meal 2-3 hrs before start. Oatmeal, banana, PB, coffee.",
+    "<strong>On-bike foods:</strong> PB&J, fig bars, bananas, rice cakes. Gels when you can't chew.",
+    "<strong>Keep rest stops to 10-12 min.</strong> Eat, refill, bathroom. Longer = stiffer legs.",
+    "<strong>Test everything in training.</strong> Never eat anything new on race day.",
+    "<strong>Night 1:</strong> Protein + carbs immediately. Pasta, chicken, rice. Hydrate until bed."]},
+  {icon:"\uD83D\uDEB2",title:"Bike Setup",items:[
+    "<strong>Get a bike fit</strong> if you haven't recently. A few mm prevents 200 miles of knee pain.",
+    "<strong>Padded shorts, no underwear.</strong> Chamois cream generously (Body Glide or Blue Steel).",
+    "<strong>Tire pressure:</strong> At 200 lbs, ~90-95 psi road tires. Check each morning.",
+    "<strong>Gearing:</strong> 28t+ rear cassette. Spin easy gears, save your knees.",
+    "<strong>Tune-up Week 6</strong> (Jun 29). Brakes, shifting, chain, tires. Ride once after to verify.",
+    "<strong>Two water bottles minimum.</strong> July heat surprises."]},
+  {icon:"\uD83D\uDCAA",title:"Recovery (age 61)",items:[
+    "<strong>Sleep is training tool #1.</strong> 8+ hours every night. Fitness builds during rest.",
+    "<strong>Never go hard two days in a row.</strong> Back-to-back weekends = Saturday hard, Sunday easy.",
+    "<strong>Peloton on tired days.</strong> Sore Tuesday? 30 min low-impact Peloton. Still counts.",
+    "<strong>Day 1 to Day 2:</strong> Eat immediately. Elevate legs 20 min. Stretch. Hydrate. Skip the beer.",
+    "<strong>Taper is not optional.</strong> Weeks 7-8 you ride less. It feels wrong. Trust it.",
+    "<strong>It's OK to skip a ride.</strong> Missing one workout won't hurt. Pushing through injury will."]},
+  {icon:"\uD83C\uDFCB",title:"Peloton Tips",items:[
+    "<strong>Use it for midweek rides</strong> when weather is bad, you're tired, or short on time.",
+    "<strong>Best classes:</strong> Endurance Ride, Low Impact Ride. Skip HIIT and Tabata.",
+    "<strong>30-40 min is plenty</strong> indoors. Don't try to match outdoor mileage.",
+    "<strong>Long rides always outside.</strong> Practice on your actual bike with real food.",
+    "<strong>Cadence:</strong> Practice 75-85 RPM in easy gears. That's your STP rhythm."]},
+  {icon:"\uD83D\uDCCB",title:"Race Day Logistics",items:[
+    "<strong>Start:</strong> UW Parking Lot E-18. 2-day riders: 5:30-7:30 AM Saturday.",
+    "<strong>Finish:</strong> Holladay Park, Portland. Meal, shirt, badge included.",
+    "<strong>Bag drop:</strong> Fri 6-9 PM or Sat morning. Pack: clothes, charger, chamois cream.",
+    "<strong>Overnight:</strong> Centralia College area (mile 101). Book lodging ASAP.",
+    "<strong>Support:</strong> (206) 841-9665 (on your bib). 10 vehicles patrol the route.",
+    "<strong>Carry:</strong> ID, cash, phone, 2 tubes, CO2/pump, tire levers, multi-tool, sunscreen."]},
+  {icon:"\uD83E\uDDE0",title:"Mental Game",items:[
+    "<strong>Think in segments.</strong> \"19 mi to Renton, 23 to Puyallup, 13 to Spanaway...\"",
+    "<strong>Mile 60-80 is where you earn it.</strong> Everyone hurts. Keep going.",
+    "<strong>Your 55-mile ride proves you can do this.</strong> STP = two of those with rest stops and 8,000 friends.",
+    "<strong>Ride together.</strong> Family on the road is the best part.",
+    "<strong>You're 61, riding 206 miles.</strong> Most people never will. Enjoy every mile."]}
+];
+
+const CHEERS=[
+  "RIDE LOGGED","CRUSHED IT","MILES BANKED","BEAST MODE",
+  "LEGS OF STEEL","KEEP ROLLING","PEDAL POWER","ON FIRE",
+  "DIALED IN","STRONG WORK","LOCKED IN","LET'S GO"
+];
+const SUBS=[
+  "Another one in the books","STP is calling","Portland awaits",
+  "The legs are getting stronger","Fitness: loading...","That's how it's done",
+  "Rest up, ride again","One ride closer to 206","The road knows your name"
+];
+
+// ========== STATE ==========
+function getRides(){try{return JSON.parse(localStorage.getItem('stp3')||'[]')}catch{return[]}}
+function setRides(r){localStorage.setItem('stp3',JSON.stringify(r))}
+function getDone(){try{return JSON.parse(localStorage.getItem('stp3done')||'{}')}catch{return{}}}
+function setDone(d){localStorage.setItem('stp3done',JSON.stringify(d))}
+function getLoc(){try{return JSON.parse(localStorage.getItem('stp_loc')||'null')}catch{return null}}
+function setLoc(loc){localStorage.setItem('stp_loc',JSON.stringify(loc))}
+let editIdx=-1;
+
+// ========== SETTINGS ==========
+function openSettings(){
+  const loc=getLoc();
+  document.getElementById('f-loc').value=loc?loc.name:'';
+  const st=document.getElementById('loc-status');
+  if(loc){st.textContent='Saved: '+loc.label;st.className='loc-status ok'}
+  else{st.textContent='';st.className='loc-status'}
+  document.getElementById('settings-modal').classList.add('show');
+}
+function closeSettings(){document.getElementById('settings-modal').classList.remove('show')}
+async function saveSettings(){
+  const name=document.getElementById('f-loc').value.trim();
+  const st=document.getElementById('loc-status');
+  if(!name){
+    localStorage.removeItem('stp_loc');
+    st.textContent='Location cleared';st.className='loc-status';
+    renderWeather();return;
+  }
+  st.textContent='Looking up...';st.className='loc-status';
+  try{
+    const r=await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(name)}&count=1&language=en`);
+    const j=await r.json();
+    if(!j.results||!j.results.length){
+      st.textContent='Not found — try a city name';st.className='loc-status err';return;
+    }
+    const g=j.results[0];
+    const label=g.name+(g.admin1?', '+g.admin1:'')+(g.country_code&&g.country_code!=='US'?', '+g.country_code:'');
+    const loc={name,label,lat:g.latitude,lon:g.longitude,tz:g.timezone};
+    setLoc(loc);
+    st.textContent='Saved: '+label;st.className='loc-status ok';
+    renderWeather();
+  }catch(e){
+    st.textContent='Lookup failed — check connection';st.className='loc-status err';
+  }
+}
+function resetAll(){
+  if(!confirm('Reset everything? This wipes all logged rides, checkmarks, and notes. Cannot be undone.'))return;
+  localStorage.removeItem('stp3');
+  localStorage.removeItem('stp3done');
+  closeSettings();
+  renderLogList();renderProgress();renderPlan();renderToday();countdown();renderWeather();
+}
+document.getElementById('settings-modal').addEventListener('click',function(e){if(e.target===this)closeSettings()});
+
+// ========== WEATHER ==========
+const WCODES={
+  0:{i:'☀️',t:'Clear'},1:{i:'🌤',t:'Mostly clear'},
+  2:{i:'⛅',t:'Partly cloudy'},3:{i:'☁️',t:'Overcast'},
+  45:{i:'🌫',t:'Fog'},48:{i:'🌫',t:'Fog'},
+  51:{i:'🌦',t:'Light drizzle'},53:{i:'🌦',t:'Drizzle'},55:{i:'🌧',t:'Heavy drizzle'},
+  61:{i:'🌧',t:'Light rain'},63:{i:'🌧',t:'Rain'},65:{i:'🌧',t:'Heavy rain'},
+  71:{i:'🌨',t:'Light snow'},73:{i:'🌨',t:'Snow'},75:{i:'❄️',t:'Heavy snow'},
+  77:{i:'❄️',t:'Snow grains'},
+  80:{i:'🌦',t:'Rain showers'},81:{i:'🌧',t:'Heavy showers'},82:{i:'⛈',t:'Violent showers'},
+  85:{i:'🌨',t:'Snow showers'},86:{i:'🌨',t:'Heavy snow showers'},
+  95:{i:'⛈',t:'Thunderstorm'},96:{i:'⛈',t:'T-storm w/hail'},99:{i:'⛈',t:'Severe storm'}
+};
+function nextRide(){
+  const today=new Date();today.setHours(0,0,0,0);
+  const done=getDone();
+  for(const w of PLAN){
+    for(const r of w.rides){
+      if(r.mi<=0)continue;
+      if(done[w.wk+'-'+r.d])continue;
+      const d=rideDate(w.wk,r.d);d.setHours(0,0,0,0);
+      if(d>=today)return{date:d,ride:r,wk:w};
+    }
+  }
+  return null;
+}
+async function renderWeather(){
+  const c=document.getElementById('weather-card');
+  const loc=getLoc();
+  if(!loc){
+    c.innerHTML='<div class="weather-empty" onclick="openSettings()">Add a location in settings for weather →</div>';
+    return;
+  }
+  const nr=nextRide();
+  if(!nr){c.innerHTML='';return;}
+  const iso=nr.date.getFullYear()+'-'+String(nr.date.getMonth()+1).padStart(2,'0')+'-'+String(nr.date.getDate()).padStart(2,'0');
+  try{
+    const url=`https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weathercode&temperature_unit=fahrenheit&timezone=auto&start_date=${iso}&end_date=${iso}`;
+    const r=await fetch(url);
+    const j=await r.json();
+    if(!j.daily||!j.daily.time||!j.daily.time.length){c.innerHTML='';return;}
+    const hi=Math.round(j.daily.temperature_2m_max[0]);
+    const lo=Math.round(j.daily.temperature_2m_min[0]);
+    const code=j.daily.weathercode[0];
+    const rain=j.daily.precipitation_probability_max[0]||0;
+    const wc=WCODES[code]||{i:'🌤',t:'—'};
+    const dayLbl=nr.date.toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});
+    c.innerHTML=`<div class="weather">
+      <div class="weather-icon">${wc.i}</div>
+      <div class="weather-info">
+        <div class="weather-label">Next ride · ${nr.ride.n}</div>
+        <div class="weather-day">${dayLbl}</div>
+        <div class="weather-cond">${wc.t} · ${loc.label}</div>
+      </div>
+      <div class="weather-temps">
+        <div class="weather-hi">${hi}°</div>
+        <div class="weather-lo">${lo}°</div>
+        ${rain>=20?`<div class="weather-rain">${rain}% rain</div>`:''}
+      </div>
+    </div>`;
+  }catch(e){
+    c.innerHTML='<div class="weather-empty">Weather unavailable</div>';
+  }
+}
+
+// ========== NAV ==========
+function go(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('p-'+id).classList.add('active');
+  btn.classList.add('active');window.scrollTo(0,0);
+  document.getElementById('fab').style.display=id==='home'?'block':'none';
+}
+
+// ========== HELPERS ==========
+function rideDate(wk,day){
+  const map={Mon:0,Tue:1,Wed:2,Thu:3,Fri:4,Sat:5,Sun:6};
+  const d=new Date(START);d.setDate(d.getDate()+(wk-1)*7+(map[day]||0));return d;
+}
+
+// ========== COUNTDOWN ==========
+function countdown(){
+  const now=new Date(),diff=EVENT-now;
+  const days=Math.max(0,Math.ceil(diff/864e5));
+  document.getElementById('cd-days').textContent=days;
+  document.getElementById('cd-weeks').textContent=Math.max(0,Math.ceil(days/7));
+  const total=Math.max(1,Math.ceil((EVENT-START)/864e5)),pct=Math.min(1,1-days/total),circ=553;
+  document.getElementById('ring').style.strokeDashoffset=circ-(circ*pct);
+  const today=new Date();today.setHours(0,0,0,0);
+  const done=getDone();let left=0;
+  PLAN.forEach(w=>w.rides.forEach(r=>{
+    if(r.mi>0&&!done[w.wk+'-'+r.d]){const d=rideDate(w.wk,r.d);if(d>=today)left++}
+  }));
+  document.getElementById('cd-rides').textContent=left;
+}
+
+// ========== TODAY ==========
+function renderToday(){
+  const today=new Date();today.setHours(0,0,0,0);
+  const c=document.getElementById('today-card');
+  if(today<START){
+    const startLbl=START.toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});
+    c.innerHTML=`<div class="today today-pre"><div class="today-glow"></div>
+      <div class="today-label">Coming Up</div>
+      <div class="today-name">Training begins ${startLbl}</div>
+      <div class="today-desc">Week 1 kicks off with an easy 10-mile spin Tuesday. Get a good sleep — you've got this.</div></div>`;
+    return;
+  }
+  let wo=null,wk=null;
+  for(const w of PLAN){for(const r of w.rides){
+    const d=rideDate(w.wk,r.d);d.setHours(0,0,0,0);
+    if(d.getTime()===today.getTime()){wo=r;wk=w;break}}if(wo)break}
+  if(wo&&wo.mi>0){
+    c.innerHTML=`<div class="today today-ride"><div class="today-glow"></div>
+      <div class="today-label">Today \u2014 Week ${wk.wk} ${wk.phase}</div>
+      <div class="today-name">${wo.n}</div><div class="today-miles">${wo.mi} mi</div>
+      <div class="today-desc">${wo.desc}</div></div>`;
+  }else if(wo&&wo.mi===0){
+    c.innerHTML=`<div class="today today-rest"><div class="today-glow" style="background:var(--green)"></div>
+      <div class="today-label">Today \u2014 Week ${wk.wk}</div>
+      <div class="today-name">${wo.n}</div><div class="today-desc">${wo.desc}</div></div>`;
+  }else{
+    c.innerHTML=`<div class="today today-rest"><div class="today-glow" style="background:var(--green)"></div>
+      <div class="today-label">Today</div><div class="today-name">Rest Day</div>
+      <div class="today-desc">No ride scheduled. Stretch, hydrate, sleep well.</div></div>`;
+  }
+}
+
+// ========== PROGRESS ==========
+function renderProgress(){
+  const rides=getRides(),logged=rides.reduce((s,r)=>s+(parseFloat(r.mi)||0),0);
+  const total=PLAN.reduce((s,w)=>s+w.mi,0),pct=total?Math.min(100,Math.round(logged/total*100)):0;
+  document.getElementById('p-logged').textContent=Math.round(logged);
+  document.getElementById('p-total').textContent=total;
+  document.getElementById('p-fill').style.width=pct+'%';
+  document.getElementById('p-pct').textContent=pct+'%';
+  document.getElementById('p-count').textContent=rides.length+' ride'+(rides.length!==1?'s':'');
+}
+
+// ========== LOG LIST ==========
+function renderLogList(){
+  const rides=getRides(),c=document.getElementById('log-list');
+  if(!rides.length){c.innerHTML='<div class="log-empty">No rides logged yet. Tap \u2714 in the Plan or + to add.</div>';return}
+  c.innerHTML=rides.slice(0,10).map((r,i)=>{
+    const d=new Date(r.date+'T12:00:00');
+    const ds=d.toLocaleDateString('en-US',{month:'short',day:'numeric',weekday:'short'});
+    return`<div class="log-entry" onclick="editLog(${i})"><div><div class="log-date">${ds}</div>
+      ${r.notes?`<div class="log-note">${r.notes.substring(0,40)}</div>`:''}</div>
+      <div class="log-miles">${r.mi} mi</div></div>`;
+  }).join('');
+}
+
+// ========== LOG MODAL ==========
+function openLog(){
+  editIdx=-1;document.getElementById('modal-title').textContent='Log a Ride';
+  document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('f-miles').value='';document.getElementById('f-dur').value='';
+  document.getElementById('f-notes').value='';document.getElementById('modal-del').style.display='none';
+  document.getElementById('modal-save').textContent='Save Ride';
+  document.getElementById('log-modal').classList.add('show');
+}
+function editLog(i){
+  editIdx=i;const r=getRides()[i];
+  document.getElementById('modal-title').textContent='Edit Ride';
+  document.getElementById('f-date').value=r.date;document.getElementById('f-miles').value=r.mi;
+  document.getElementById('f-dur').value=r.dur||'';document.getElementById('f-notes').value=r.notes||'';
+  document.getElementById('modal-del').style.display='block';
+  document.getElementById('modal-save').textContent='Update';
+  document.getElementById('log-modal').classList.add('show');
+}
+function closeLog(){document.getElementById('log-modal').classList.remove('show')}
+function saveLog(){
+  const date=document.getElementById('f-date').value,mi=parseFloat(document.getElementById('f-miles').value);
+  if(!date||!mi){alert('Enter a date and distance.');return}
+  const dur=document.getElementById('f-dur').value,notes=document.getElementById('f-notes').value;
+  const rides=getRides();
+  if(editIdx>=0)rides[editIdx]={date,mi,dur,notes};else rides.push({date,mi,dur,notes});
+  rides.sort((a,b)=>b.date.localeCompare(a.date));setRides(rides);closeLog();
+  renderLogList();renderProgress();countdown();
+  if(editIdx<0)fireStorm(mi);
+}
+function delLog(){
+  if(!confirm('Delete this ride?'))return;
+  const rides=getRides();rides.splice(editIdx,1);setRides(rides);
+  closeLog();renderLogList();renderProgress();countdown();
+}
+document.getElementById('log-modal').addEventListener('click',function(e){if(e.target===this)closeLog()});
+
+// ========== CHECKMARK + CONFIRM ==========
+let pendingConfirm=null;
+function checkRide(wk,dayKey,mi){
+  const key=wk+'-'+dayKey,done=getDone();
+  const isUndo=!!done[key];
+  const w=PLAN.find(p=>p.wk===wk);
+  const r=w.rides.find(x=>x.d===dayKey);
+  pendingConfirm={wk,dayKey,mi,undo:isUndo};
+  document.getElementById('confirm-name').textContent=r.n;
+  document.getElementById('confirm-detail').textContent='Week '+wk+' \u00b7 '+r.d;
+  document.getElementById('confirm-mi').textContent=mi;
+  const btn=document.getElementById('confirm-action');
+  const emoji=document.querySelector('.confirm-emoji');
+  const mlbl=document.querySelector('.confirm-mi-label');
+  if(isUndo){
+    btn.textContent='Remove Ride';btn.className='btn btn-remove';
+    emoji.innerHTML='&#x21A9;&#xFE0F;';mlbl.textContent='miles logged';
+  }else{
+    btn.textContent='Log This Ride';btn.className='btn btn-cyan';
+    emoji.innerHTML='&#x1F6B4;';mlbl.textContent='miles';
+  }
+  document.getElementById('confirm-modal').classList.add('show');
+}
+function confirmRide(){
+  if(!pendingConfirm)return;
+  const{wk,dayKey,mi,undo}=pendingConfirm;
+  const key=wk+'-'+dayKey,done=getDone();
+  if(undo){
+    delete done[key];setDone(done);
+    const dt=rideDate(wk,dayKey);
+    const dateStr=dt.toISOString().split('T')[0];
+    const rides=getRides();
+    const idx=rides.findIndex(r=>r.date===dateStr&&parseFloat(r.mi)===mi);
+    if(idx>=0)rides.splice(idx,1);
+    setRides(rides);
+  }else{
+    done[key]=true;setDone(done);
+    const dt=rideDate(wk,dayKey);
+    const dateStr=dt.toISOString().split('T')[0];
+    const w=PLAN.find(p=>p.wk===wk);
+    const r=w.rides.find(x=>x.d===dayKey);
+    const rides=getRides();
+    rides.push({date:dateStr,mi:mi,dur:'',notes:r.n+' \u2014 Week '+wk});
+    rides.sort((a,b)=>b.date.localeCompare(a.date));setRides(rides);
+  }
+  document.getElementById('confirm-modal').classList.remove('show');
+  pendingConfirm=null;
+  renderPlan();renderProgress();renderLogList();renderToday();countdown();renderWeather();
+  if(!undo)fireStorm(mi);
+}
+function cancelConfirm(){
+  document.getElementById('confirm-modal').classList.remove('show');
+  pendingConfirm=null;
+}
+document.getElementById('confirm-modal').addEventListener('click',function(e){if(e.target===this)cancelConfirm()});
+
+// ========== PLAN ==========
+function renderPlan(){
+  const today=new Date();today.setHours(0,0,0,0);
+  const daysSince=Math.floor((today-START)/864e5),curWk=Math.floor(daysSince/7)+1;
+  const done=getDone();
+  let h='';
+  PLAN.forEach(w=>{
+    const cur=w.wk===curWk;
+    h+=`<div class="week ${cur?'current':''}">
+      <div class="week-top" onclick="toggleWk(this)">
+        <div class="week-left"><div class="week-num">WEEK ${w.wk}</div><div class="week-dates">${w.dates}</div></div>
+        <div class="week-right"><div><span class="week-total">${w.mi}</span><span class="week-mi"> mi</span></div>
+          <span class="phase-tag ${w.tag}">${w.phase}</span></div>
+      </div>
+      <div class="week-body ${cur?'open':''}"><div class="week-body-inner">
+        <div class="week-focus">${w.focus}</div>
+        ${w.rides.map(r=>{
+          const k=w.wk+'-'+r.d,isDone=done[k];
+          return`<div class="ride-row">
+            <div class="ride-day">${r.d}</div>
+            <div class="ride-info"><div class="ride-name">${r.n}</div><div class="ride-desc">${r.desc}</div></div>
+            <div class="ride-mi ${r.mi===0?'rest':''}">${r.mi>0?r.mi:'REST'}</div>
+            <button class="ck ${isDone?'done':''} ${r.mi===0?'noride':''}"
+              onclick="event.stopPropagation();checkRide(${w.wk},'${r.d}',${r.mi})">\u2713</button>
+          </div>`;
+        }).join('')}
+      </div></div></div>`;
+  });
+  h+=`<div class="week" style="border-color:var(--amber-dim)"><div class="week-top" style="cursor:default">
+    <div class="week-left"><div class="week-num" style="color:var(--coral)">JULY 11-12</div>
+      <div class="week-dates">Seattle to Portland</div></div>
+    <div class="week-right"><div><span class="week-total">206</span><span class="week-mi"> mi</span></div>
+      <span class="phase-tag" style="background:linear-gradient(135deg,rgba(232,149,58,.15),rgba(248,113,113,.15));color:var(--amber)">STP!</span></div>
+  </div></div>`;
+  document.getElementById('plan-list').innerHTML=h;
+}
+function toggleWk(el){el.nextElementSibling.classList.toggle('open')}
+
+// ========== GOLDEN STORM (4s cinematic) ==========
+function fireStorm(mi){
+  const storm=document.getElementById('storm');
+  const canvas=document.getElementById('storm-canvas');
+  const ctx=canvas.getContext('2d');
+  const msgEl=document.getElementById('storm-msg');
+  const bgEl=document.getElementById('storm-bg');
+  const dpr=window.devicePixelRatio||1;
+  const W=window.innerWidth,H=window.innerHeight;
+  canvas.width=W*dpr;canvas.height=H*dpr;
+  canvas.style.width=W+'px';canvas.style.height=H+'px';
+  ctx.scale(dpr,dpr);
+  const cx=W/2,cy=H/2;
+
+  document.getElementById('storm-miles').textContent=mi+' mi';
+  document.getElementById('storm-text').textContent=CHEERS[Math.floor(Math.random()*CHEERS.length)];
+  document.getElementById('storm-sub').textContent=SUBS[Math.floor(Math.random()*SUBS.length)];
+
+  msgEl.style.opacity='0';msgEl.style.transform='translate(-50%,-50%) scale(.88)';
+  bgEl.style.opacity='0';
+  storm.classList.add('active');
+  requestAnimationFrame(()=>{bgEl.style.opacity='1'});
+
+  const DUR=4000,t0=performance.now();
+  function eOut(t){return 1-Math.pow(1-t,3)}
+  function eIn(t){return t*t*t}
+
+  function makeBolt(){
+    const edge=Math.floor(Math.random()*4);
+    let sx,sy;
+    if(edge===0){sx=Math.random()*W;sy=-10}
+    else if(edge===1){sx=W+10;sy=Math.random()*H}
+    else if(edge===2){sx=Math.random()*W;sy=H+10}
+    else{sx=-10;sy=Math.random()*H}
+    const tx=cx+(Math.random()-.5)*180,ty=cy+(Math.random()-.5)*100;
+    const n=10+Math.floor(Math.random()*8),pts=[{x:sx,y:sy}];
+    for(let i=1;i<=n;i++){
+      const t=i/n,e=t*t*(3-2*t);
+      const sp=85*(1-t*.5)*Math.sin(t*Math.PI);
+      pts.push({x:sx+(tx-sx)*e+(Math.random()-.5)*sp,
+                y:sy+(ty-sy)*e+(Math.random()-.5)*sp});
+    }
+    const br=[];
+    for(let i=3;i<pts.length-2;i+=1+Math.floor(Math.random()*2)){
+      if(Math.random()>.5)continue;
+      const p=pts[i],a=Math.atan2(ty-sy,tx-sx)+(Math.random()-.5)*2.2;
+      const len=20+Math.random()*55,bp=[{x:p.x,y:p.y}];
+      const bn=2+Math.floor(Math.random()*3);
+      for(let j=1;j<=bn;j++){const bt=j/bn;
+        bp.push({x:p.x+Math.cos(a)*len*bt+(Math.random()-.5)*18,
+                 y:p.y+Math.sin(a)*len*bt+(Math.random()-.5)*18})}
+      br.push(bp);
+    }
+    return{pts,br,w:1+Math.random()*2.5,hue:25+Math.random()*30,
+      fp:Math.random()*Math.PI*2,fs:3+Math.random()*5};
+  }
+
+  const waves=[
+    {b:Array.from({length:4},makeBolt),s:.06,de:.22,fe:.52},
+    {b:Array.from({length:3},makeBolt),s:.22,de:.38,fe:.62},
+    {b:Array.from({length:2},makeBolt),s:.42,de:.52,fe:.76}
+  ];
+
+  const sparks=[];
+  function addSpark(x,y,n,hue){
+    for(let i=0;i<n;i++){
+      const a=Math.random()*Math.PI*2,sp=.3+Math.random()*2.2;
+      sparks.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,
+        life:1,decay:.003+Math.random()*.012,sz:.8+Math.random()*2.5,
+        hue:hue+(Math.random()-.5)*30});
+    }
+  }
+
+  function drawBolt(pts,num,w,hue,alpha,jit){
+    if(num<2)return;
+    const jp=pts.map((p,i)=>i>0&&i<pts.length-1?
+      {x:p.x+(Math.random()-.5)*jit,y:p.y+(Math.random()-.5)*jit}:p);
+    function tracePath(){
+      ctx.beginPath();ctx.moveTo(jp[0].x,jp[0].y);
+      for(let i=1;i<num;i++){const p=jp[i-1],c=jp[i];
+        ctx.quadraticCurveTo(p.x,p.y,(p.x+c.x)/2,(p.y+c.y)/2)}
+      ctx.lineTo(jp[num-1].x,jp[num-1].y);
+    }
+    ctx.save();ctx.shadowBlur=50;
+    ctx.shadowColor=`hsla(${hue},100%,65%,${alpha*.5})`;
+    ctx.strokeStyle=`hsla(${hue},100%,65%,${alpha*.12})`;
+    ctx.lineWidth=w*5;ctx.lineJoin='round';ctx.lineCap='round';
+    tracePath();ctx.stroke();ctx.restore();
+    ctx.strokeStyle=`hsla(${hue},100%,75%,${alpha*.35})`;
+    ctx.lineWidth=w*2.5;ctx.lineJoin='round';ctx.lineCap='round';
+    tracePath();ctx.stroke();
+    ctx.strokeStyle=`hsla(${hue},100%,95%,${alpha*.9})`;
+    ctx.lineWidth=w*.6;
+    tracePath();ctx.stroke();
+  }
+
+  let txtOn=false;
+
+  function frame(now){
+    const el=now-t0,t=Math.min(1,el/DUR);
+    ctx.clearRect(0,0,W,H);
+
+    [.22,.36,.44].forEach(ft=>{
+      if(Math.abs(t-ft)<.02){
+        const fi=1-Math.abs(t-ft)/.02;
+        ctx.fillStyle=`rgba(232,149,58,${fi*.08})`;
+        ctx.fillRect(0,0,W,H);
+      }
+    });
+
+    waves.forEach(wv=>{
+      if(t<wv.s)return;
+      const drawProg=eOut(Math.min(1,(t-wv.s)/(wv.de-wv.s)));
+      let alpha=1;
+      if(t>wv.fe)alpha=Math.max(0,1-eIn((t-wv.fe)/(1-wv.fe)));
+      wv.b.forEach(b=>{
+        const flicker=.6+.4*Math.sin(el*.001*b.fs+b.fp);
+        const a=alpha*flicker;
+        const num=Math.floor(drawProg*b.pts.length);
+        const jt=3+Math.random()*4;
+        drawBolt(b.pts,num,b.w,b.hue,a,jt);
+        if(drawProg>.35){
+          const ba=a*.45*Math.min(1,(drawProg-.35)/.3);
+          b.br.forEach(br=>drawBolt(br,br.length,b.w*.35,b.hue,ba,jt*.5));
+        }
+        if(drawProg>.2&&drawProg<.95&&Math.random()<.4){
+          const ti=Math.min(num-1,b.pts.length-1);
+          if(ti>=0)addSpark(b.pts[ti].x,b.pts[ti].y,1,b.hue);
+        }
+      });
+    });
+
+    if(t>.22&&t<.82){
+      const bt=(t-.22)/.6;
+      const ba=Math.sin(bt*Math.PI)*.12;
+      const br=W*.38*eOut(Math.min(1,bt*2));
+      const g=ctx.createRadialGradient(cx,cy,0,cx,cy,br);
+      g.addColorStop(0,`rgba(232,149,58,${ba})`);
+      g.addColorStop(.4,`rgba(248,113,113,${ba*.5})`);
+      g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+    }
+
+    for(let i=0;i<4;i++){
+      const rs=.28+i*.06;
+      if(t<rs)continue;
+      const rt=(t-rs)/.45;
+      if(rt>1)continue;
+      const r=eOut(rt)*W*.5;
+      ctx.strokeStyle=`hsla(${25+i*10},100%,70%,${(1-eIn(rt))*.1})`;
+      ctx.lineWidth=1.8*(1-rt);
+      ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();
+    }
+
+    for(let i=sparks.length-1;i>=0;i--){
+      const s=sparks[i];
+      s.x+=s.vx;s.y+=s.vy;s.vx*=.985;s.vy*=.985;s.life-=s.decay;
+      if(s.life<=0){sparks.splice(i,1);continue}
+      ctx.save();ctx.shadowBlur=8;
+      ctx.shadowColor=`hsla(${s.hue},100%,70%,${s.life})`;
+      ctx.fillStyle=`hsla(${s.hue},100%,90%,${s.life*.7})`;
+      ctx.beginPath();ctx.arc(s.x,s.y,s.sz*s.life,0,Math.PI*2);
+      ctx.fill();ctx.restore();
+    }
+
+    if(!txtOn&&t>.35){
+      txtOn=true;
+      msgEl.style.opacity='1';
+      msgEl.style.transform='translate(-50%,-50%) scale(1)';
+    }
+
+    if(t>.85){
+      const fo=eIn((t-.85)/.15);
+      msgEl.style.opacity=String(Math.max(0,1-fo));
+      bgEl.style.opacity=String(Math.max(0,1-fo));
+    }
+
+    if(t<1){
+      requestAnimationFrame(frame);
+    }else{
+      ctx.clearRect(0,0,W,H);sparks.length=0;
+      msgEl.style.opacity='0';
+      msgEl.style.transform='translate(-50%,-50%) scale(.88)';
+      bgEl.style.opacity='0';
+      setTimeout(()=>storm.classList.remove('active'),60);
+    }
+  }
+  requestAnimationFrame(frame);
+}
+
+// ========== ROUTE ==========
+function renderRoute(){
+  let h='';
+  ROUTE.forEach(day=>{
+    h+=`<div class="route-day"><div class="route-day-header">${day.day===1?'Saturday':'Sunday'}<span>${day.sub}</span></div>`;
+    day.stops.forEach(s=>{
+      const major=s.t==='rest'||s.t==='finish'||s.t==='start';
+      const dotCls=s.t==='finish'?'finish':s.t==='start'?'start':s.t==='rest'?'major':'';
+      const bc={rest:'badge-rest',mini:'badge-mini',start:'badge-start',finish:'badge-finish'}[s.t];
+      const bt={rest:'Rest Stop',mini:'Mini Stop',start:'Start',finish:'Finish Line'}[s.t];
+      h+=`<div class="stop"><div class="stop-line"><div class="stop-dot ${dotCls}"></div><div class="stop-wire"></div></div>
+        <div class="stop-content"><div class="stop-mile-num">MILE ${s.mi}</div>
+          <div class="stop-place ${major?dotCls:''}">${s.name}</div>
+          <div class="stop-detail">${s.info}</div><span class="stop-badge ${bc}">${bt}</span></div></div>`;
+    });h+='</div>';
+  });
+  document.getElementById('route-list').innerHTML=h;
+}
+
+// ========== TIPS ==========
+function renderTips(){
+  document.getElementById('tips-list').innerHTML=TIPS.map(t=>`
+    <div class="tip-card" onclick="this.classList.toggle('open')"><div class="tip-top">
+      <div class="tip-icon">${t.icon}</div><div class="tip-title">${t.title}</div>
+      <div class="tip-arrow">\u25B6</div></div>
+      <div class="tip-body"><div class="tip-body-inner">
+        <ul>${t.items.map(li=>'<li>'+li+'</li>').join('')}</ul></div></div></div>`).join('');
+}
+
+// ========== INIT ==========
+countdown();renderToday();renderProgress();renderLogList();renderPlan();renderRoute();renderTips();renderWeather();
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body>
+</html>

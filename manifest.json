@@ -1,0 +1,24 @@
+{
+  "name": "STP 2026 - Vadim's Training",
+  "short_name": "STP 2026",
+  "description": "Seattle to Portland 2026 training plan for Vadim",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0c0b0f",
+  "theme_color": "#0c0b0f",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
