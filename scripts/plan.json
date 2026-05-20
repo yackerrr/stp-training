@@ -1,0 +1,94 @@
+{
+  "start": "2026-05-25",
+  "raceDate": "2026-07-11",
+  "siteUrl": "https://yackerrr.github.io/stp-training/",
+  "weeks": [
+    {
+      "wk": 1,
+      "dates": "May 25-31",
+      "phase": "Base",
+      "mi": 42,
+      "focus": "Build the routine, start fueling practice",
+      "rides": [
+        { "d": "Tue", "n": "Easy Spin",  "desc": "10 mi flat outside or 30 min Peloton",          "mi": 10 },
+        { "d": "Thu", "n": "Steady Ride","desc": "Add a gentle hill or two. Comfortable pace",    "mi": 12 },
+        { "d": "Sat", "n": "Long Ride",  "desc": "Bring a snack, eat at mile 10. Practice fueling!","mi": 20 }
+      ]
+    },
+    {
+      "wk": 2,
+      "dates": "Jun 1-7",
+      "phase": "Build",
+      "mi": 55,
+      "focus": "Stretch to 30 miles. Wear your race-day shorts and kit",
+      "rides": [
+        { "d": "Tue", "n": "Easy Spin",  "desc": "10 mi outside or 40 min Peloton endurance",      "mi": 10 },
+        { "d": "Thu", "n": "Hills Ride", "desc": "Pick a route with climbing. Build leg strength", "mi": 15 },
+        { "d": "Sat", "n": "Long Ride",  "desc": "Wear STP kit, test comfort. Full nutrition practice","mi": 30 }
+      ]
+    },
+    {
+      "wk": 3,
+      "dates": "Jun 8-14",
+      "phase": "Build",
+      "mi": 65,
+      "focus": "First back-to-back weekend! Simulates STP Day 1 + Day 2",
+      "rides": [
+        { "d": "Tue", "n": "Easy Spin",  "desc": "10 mi outside or 40 min Peloton",                "mi": 10 },
+        { "d": "Thu", "n": "Hills Ride", "desc": "Moderate effort with sustained climbs",          "mi": 15 },
+        { "d": "Sat", "n": "Long Ride",  "desc": "Steady pace, practice your rest-stop routine",   "mi": 30 },
+        { "d": "Sun", "n": "Day 2 Legs", "desc": "Ride on tired legs — STP Day 2 practice!",      "mi": 10 }
+      ]
+    },
+    {
+      "wk": 4,
+      "dates": "Jun 15-21",
+      "phase": "Build",
+      "mi": 73,
+      "focus": "New longest ride: 40 miles! Back-to-back weekend again",
+      "rides": [
+        { "d": "Tue", "n": "Easy Spin",  "desc": "10 mi outside or 30 min Peloton. Easy this week","mi": 10 },
+        { "d": "Thu", "n": "Steady Ride","desc": "Event pace. Nothing over moderate effort",       "mi": 15 },
+        { "d": "Sat", "n": "Long Ride",  "desc": "40 miles! Full race nutrition. Stop every hour", "mi": 40 },
+        { "d": "Sun", "n": "Day 2 Legs", "desc": "Easy spin on tired legs. This is normal!",       "mi": 8 }
+      ]
+    },
+    {
+      "wk": 5,
+      "dates": "Jun 22-28",
+      "phase": "Peak",
+      "mi": 83,
+      "focus": "PEAK WEEK — match your 50-mile Discovery Trail PR!",
+      "rides": [
+        { "d": "Tue", "n": "Easy Spin",  "desc": "10 mi outside or 30 min Peloton. Save legs",     "mi": 10 },
+        { "d": "Thu", "n": "Steady Ride","desc": "Moderate and flat. Don't go hard before Saturday","mi": 15 },
+        { "d": "Sat", "n": "Long Ride",  "desc": "50 miles! Your biggest training ride. Full race sim","mi": 50 },
+        { "d": "Sun", "n": "Day 2 Legs", "desc": "Easy spin. Last back-to-back before STP",        "mi": 8 }
+      ]
+    },
+    {
+      "wk": 6,
+      "dates": "Jun 29 - Jul 5",
+      "phase": "Taper",
+      "mi": 40,
+      "focus": "Ride less, rest more. Bike shop tune-up this week!",
+      "rides": [
+        { "d": "Tue", "n": "Easy Spin",  "desc": "10 mi outside or 30 min easy Peloton",           "mi": 10 },
+        { "d": "Thu", "n": "Easy Ride", "desc": "Flat and easy. Enjoy the scenery",                "mi": 12 },
+        { "d": "Sat", "n": "Shakeout",  "desc": "Test bike after tune-up. Easy effort only",       "mi": 18 }
+      ]
+    },
+    {
+      "wk": 7,
+      "dates": "Jul 6-12",
+      "phase": "Rest",
+      "mi": 8,
+      "focus": "REST WEEK. Light spinning only. Prep gear, pack bags — race Saturday!",
+      "rides": [
+        { "d": "Tue", "n": "Light Spin",    "desc": "20-30 min very easy. Peloton or outside",    "mi": 8 },
+        { "d": "Thu", "n": "Rest Day",      "desc": "Full rest. Stretch, foam roll. Lay out gear","mi": 0 },
+        { "d": "Fri", "n": "Packet Pickup", "desc": "UW Lot E-18, 6-9 PM. Drop overnight bag",    "mi": 0 }
+      ]
+    }
+  ]
+}

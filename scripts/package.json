@@ -1,0 +1,9 @@
+{
+  "name": "stp-notifier",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Web Push sender for STP training PWA",
+  "dependencies": {
+    "web-push": "^3.6.7"
+  }
+}

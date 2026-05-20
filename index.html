@@ -314,6 +314,11 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .loc-status{font-size:12px;color:var(--text3);margin-top:6px;min-height:16px}
 .loc-status.ok{color:var(--green)}
 .loc-status.err{color:var(--coral)}
+.sub-box{width:100%;padding:10px;background:var(--surface2);
+  border:1px solid var(--surface3);border-radius:var(--radius-sm);
+  color:var(--text2);font-family:var(--mono);font-size:10px;
+  margin-top:8px;resize:none;word-break:break-all;outline:none;
+  -webkit-user-select:all;user-select:all}
 
 /* ===== WEATHER CARD ===== */
 .weather{background:var(--surface);border-radius:var(--radius);padding:18px 20px;
@@ -430,7 +435,14 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       <input type="text" id="f-loc" placeholder="e.g. Seattle, WA" autocomplete="off">
       <div id="loc-status" class="loc-status"></div>
     </div>
-    <button class="btn btn-cyan" onclick="saveSettings()">Save</button>
+    <div class="field">
+      <label>Notifications</label>
+      <button class="btn btn-cyan" id="notif-btn" onclick="toggleNotif()">Enable Notifications</button>
+      <div id="notif-status" class="loc-status"></div>
+      <textarea id="sub-json" class="sub-box" readonly rows="4" style="display:none"></textarea>
+      <button class="btn btn-ghost" id="copy-btn" onclick="copySub()" style="display:none;margin-top:6px">Copy subscription JSON</button>
+    </div>
+    <button class="btn btn-cyan" onclick="saveSettings()">Save Location</button>
     <button class="btn btn-remove" onclick="resetAll()">Reset All Data</button>
     <button class="btn btn-ghost" onclick="closeSettings()">Close</button>
   </div>
@@ -474,6 +486,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 <script>
 const EVENT=new Date(2026,6,11);
 const START=new Date(2026,4,25);
+const VAPID_PUBLIC_KEY='BB5etBI3_7lPty6jsYubKwzepT703qiwbuwt1oA5rAKJuQo1LaGcerqqTHo4mQmb2bWp2ZnPvWDqTv6C5CK5ibQ';
 
 const PLAN=[
   {wk:1,dates:"May 25-31",phase:"Base",tag:"tag-base",mi:42,
@@ -635,6 +648,7 @@ function openSettings(){
   if(loc){st.textContent='Saved: '+loc.label;st.className='loc-status ok'}
   else{st.textContent='';st.className='loc-status'}
   document.getElementById('settings-modal').classList.add('show');
+  refreshNotifUI();
 }
 function closeSettings(){document.getElementById('settings-modal').classList.remove('show')}
 async function saveSettings(){
@@ -670,6 +684,80 @@ function resetAll(){
   renderLogList();renderProgress();renderPlan();renderToday();countdown();renderWeather();
 }
 document.getElementById('settings-modal').addEventListener('click',function(e){if(e.target===this)closeSettings()});
+
+// ========== NOTIFICATIONS ==========
+function urlBase64ToUint8Array(b64){
+  const padding='='.repeat((4-b64.length%4)%4);
+  const base64=(b64+padding).replace(/-/g,'+').replace(/_/g,'/');
+  const raw=atob(base64);const arr=new Uint8Array(raw.length);
+  for(let i=0;i<raw.length;i++)arr[i]=raw.charCodeAt(i);
+  return arr;
+}
+async function getSub(){
+  if(!('serviceWorker' in navigator)||!('PushManager' in window))return null;
+  const reg=await navigator.serviceWorker.ready;
+  return reg.pushManager.getSubscription();
+}
+async function refreshNotifUI(){
+  const btn=document.getElementById('notif-btn');
+  const st=document.getElementById('notif-status');
+  const box=document.getElementById('sub-json');
+  const copy=document.getElementById('copy-btn');
+  if(!('Notification' in window)||!('PushManager' in window)){
+    btn.disabled=true;btn.textContent='Not supported';
+    st.textContent='Notifications need an installed PWA on Android.';st.className='loc-status err';
+    box.style.display='none';copy.style.display='none';return;
+  }
+  if(Notification.permission==='denied'){
+    btn.disabled=true;btn.textContent='Blocked';
+    st.textContent='Permission denied — enable in browser settings.';st.className='loc-status err';
+    box.style.display='none';copy.style.display='none';return;
+  }
+  btn.disabled=false;
+  const sub=await getSub();
+  if(sub){
+    btn.textContent='Disable Notifications';btn.className='btn btn-remove';
+    st.textContent='✓ Subscribed';st.className='loc-status ok';
+    box.value=JSON.stringify(sub);box.style.display='block';copy.style.display='block';
+  }else{
+    btn.textContent='Enable Notifications';btn.className='btn btn-cyan';
+    st.textContent='';st.className='loc-status';
+    box.style.display='none';copy.style.display='none';
+  }
+}
+async function toggleNotif(){
+  const st=document.getElementById('notif-status');
+  const existing=await getSub();
+  if(existing){
+    try{await existing.unsubscribe();}catch{}
+    await refreshNotifUI();return;
+  }
+  const perm=await Notification.requestPermission();
+  if(perm!=='granted'){await refreshNotifUI();return;}
+  try{
+    const reg=await navigator.serviceWorker.ready;
+    await reg.pushManager.subscribe({
+      userVisibleOnly:true,
+      applicationServerKey:urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+    });
+    await refreshNotifUI();
+  }catch(e){
+    st.textContent='Subscribe failed: '+(e.message||e);st.className='loc-status err';
+  }
+}
+async function copySub(){
+  const box=document.getElementById('sub-json');
+  const copy=document.getElementById('copy-btn');
+  const orig=copy.textContent;
+  try{
+    await navigator.clipboard.writeText(box.value);
+    copy.textContent='✓ Copied!';
+  }catch{
+    box.select();try{document.execCommand('copy');copy.textContent='✓ Copied!';}
+    catch{copy.textContent='Long-press the box to copy';}
+  }
+  setTimeout(()=>copy.textContent=orig,1800);
+}
 
 // ========== WEATHER ==========
 const WCODES={

@@ -1,0 +1,54 @@
+name: Test push (manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      title:
+        description: 'Notification title'
+        required: false
+        default: 'STP test push'
+      body:
+        description: 'Notification body'
+        required: false
+        default: 'If you see this, notifications are wired up correctly.'
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: scripts/package.json
+      - run: npm install --no-audit --no-fund
+        working-directory: scripts
+      - name: Send test push
+        working-directory: scripts
+        env:
+          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          VAPID_SUBJECT: ${{ secrets.VAPID_SUBJECT }}
+          PUSH_SUBSCRIPTION: ${{ secrets.PUSH_SUBSCRIPTION }}
+          TITLE: ${{ inputs.title }}
+          BODY: ${{ inputs.body }}
+        run: |
+          node -e "
+          const webpush = require('web-push');
+          const sub = JSON.parse(process.env.PUSH_SUBSCRIPTION);
+          webpush.setVapidDetails(
+            process.env.VAPID_SUBJECT || 'mailto:noreply@example.com',
+            process.env.VAPID_PUBLIC_KEY,
+            process.env.VAPID_PRIVATE_KEY
+          );
+          const payload = JSON.stringify({
+            title: process.env.TITLE,
+            body: process.env.BODY,
+            tag: 'stp-test',
+            url: 'https://yackerrr.github.io/stp-training/',
+          });
+          webpush.sendNotification(sub, payload, { TTL: 3600 })
+            .then(r => console.log('Sent (status ' + r.statusCode + ')'))
+            .catch(e => { console.error('Failed:', e.statusCode, e.body || e.message); process.exit(1); });
+          "
